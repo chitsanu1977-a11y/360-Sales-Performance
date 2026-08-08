@@ -376,7 +376,7 @@ function renderStats() {
     <div class="stat"><b>${total}</b><span>พนักงานทั้งหมด</span></div>
     <div class="stat"><b style="color:var(--gold)">${star}</b><span>⭐ Star</span></div>
     <div class="stat"><b style="color:var(--red-dark)">${risk}</b><span>At Risk</span></div>
-    <div class="stat"><b>${fmt(avgTotal,1)}</b><span>คะแนนเฉลี่ย /100</span></div>
+    <div class="stat"><b>${fmt(avgTotal,2)}</b><span>คะแนนเฉลี่ย /100</span></div>
   `;
 }
 
@@ -412,14 +412,14 @@ function renderTable() {
       <td class="num">${fmt(r.target)}</td>
       <td class="num">${fmt(r.actual)}</td>
       <td class="num">
-        <span class="bar-wrap"><span class="bar" style="width:${Math.min(r.pct,100)}%"></span></span>${fmt(r.pct,0)}%
+        <span class="bar-wrap"><span class="bar" style="width:${Math.min(r.pct,100)}%"></span></span>${fmt(r.pct,2)}%
       </td>
-      <td class="num">${fmt(r.salesScore,1)}</td>
-      <td class="num">${r.examCount ? fmt(r.examAvg,1)+'%' : '<span class="muted">-</span>'}</td>
+      <td class="num">${fmt(r.salesScore,2)}</td>
+      <td class="num">${r.examCount ? fmt(r.examAvg,2)+'%' : '<span class="muted">-</span>'}</td>
       <td class="num muted">${r.examCount} ครั้ง</td>
-      <td class="num">${r.behaviorCount ? fmt(r.behaviorAvg,1)+'%' : '<span class="muted">-</span>'}</td>
+      <td class="num">${r.behaviorCount ? fmt(r.behaviorAvg,2)+'%' : '<span class="muted">-</span>'}</td>
       <td class="num muted">${r.behaviorCount} ครั้ง</td>
-      <td class="num" style="font-weight:800;">${fmt(r.total,1)}</td>
+      <td class="num" style="font-weight:800;">${fmt(r.total,2)}</td>
       <td><span class="badge ${badgeClass(r.group)}">${r.group}</span></td>
     </tr>
   `).join('');
@@ -562,13 +562,13 @@ function renderEmployeeModal() {
         </div>
 
         <div class="summary-grid">
-          <div class="box"><b>${fmt(r.pct,0)}%</b><span>%ยอดขาย</span></div>
-          <div class="box"><b>${fmt(r.salesScore,1)}/50</b><span>คะแนนขาย</span></div>
-          <div class="box"><b>${fmt(r.knowledgeScore,1)}/30</b><span>คะแนนความรู้</span></div>
-          <div class="box"><b>${fmt(r.behaviorScore,1)}/20</b><span>คะแนนพฤติกรรม</span></div>
+          <div class="box"><b>${fmt(r.pct,2)}%</b><span>%ยอดขาย</span></div>
+          <div class="box"><b>${fmt(r.salesScore,2)}/50</b><span>คะแนนขาย</span></div>
+          <div class="box"><b>${fmt(r.knowledgeScore,2)}/30</b><span>คะแนนความรู้</span></div>
+          <div class="box"><b>${fmt(r.behaviorScore,2)}/20</b><span>คะแนนพฤติกรรม</span></div>
         </div>
         <div style="text-align:center;margin:-8px 0 16px;">
-          <span class="badge ${badgeClass(r.group)}" style="font-size:14px;padding:6px 16px;">${r.group} · รวม ${fmt(r.total,1)}/100</span>
+          <span class="badge ${badgeClass(r.group)}" style="font-size:14px;padding:6px 16px;">${r.group} · รวม ${fmt(r.total,2)}/100</span>
         </div>
 
         <div class="tabs">
@@ -635,7 +635,7 @@ function behaviorEntryListHtml(entries) {
     <div class="entry-row">
       <div>
         <span class="val">${fmt(raw)}/${BEHAVIOR_MAX}</span>
-        <span class="muted"> · ${fmt(pct,1)}%</span>
+        <span class="muted"> · ${fmt(pct,2)}%</span>
         ${en['หมายเหตุ'] ? `<span class="muted"> · ${escapeHtml(en['หมายเหตุ'])}</span>` : ''}
         <div class="date">${fmtDate(en['วันที่'])}</div>
       </div>
