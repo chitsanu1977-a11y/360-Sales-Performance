@@ -226,7 +226,7 @@ tbody tr:last-child td{border-bottom:none;}
     </table>
   </div>
 
-  <p class="footer-note">น้ำหนักคะแนน: ยอดขาย 50 · ความรู้ 30 · พฤติกรรม 20 (รวม 100) — คะแนนขาย = %ยอดขาย÷2 (สูงสุด 50)</p>
+  <p class="footer-note">น้ำหนักคะแนน: ยอดขาย 50 · ความรู้ 30 · พฤติกรรม 20 (รวม 100) — คะแนนขาย = %ยอดขาย÷2 (สูงสุด 50) · ผลสอบกรอกเป็น % (0-100) · พฤติกรรมกรอกเป็นคะแนนดิบเต็ม 84 (ระบบแปลงเป็น % ให้อัตโนมัติ)</p>
 </main>
 
 <div class="toast" id="toast"></div>
@@ -247,6 +247,7 @@ function saveConfig() {
 }
 
 /* ================= STATE ================= */
+const BEHAVIOR_MAX = 84; // คะแนนพฤติกรรมดิบเต็ม 84 คะแนน -> แปลงเป็น % อัตโนมัติ
 let DATA = { employees: [], sales: [], exams: [], behaviors: [] };
 let SORT = { key: 'total', dir: 'desc' };
 let currentEmpId = null;
@@ -311,7 +312,8 @@ function calcEmployee(emp) {
   const knowledgeScore = examAvg * 0.3;
 
   const behaviorCount = eBehaviors.length;
-  const behaviorAvg = behaviorCount ? eBehaviors.reduce((s, r) => s + (Number(r['คะแนน']) || 0), 0) / behaviorCount : 0;
+  const behaviorAvgRaw = behaviorCount ? eBehaviors.reduce((s, r) => s + (Number(r['คะแนน']) || 0), 0) / behaviorCount : 0;
+  const behaviorAvg = behaviorAvgRaw / BEHAVIOR_MAX * 100; // แปลงจากคะแนนดิบ/84 เป็น %
   const behaviorScore = behaviorAvg * 0.2;
 
   const total = salesScore + knowledgeScore + behaviorScore;
@@ -614,13 +616,32 @@ function renderTabContent(r) {
     el.innerHTML = `
       <div class="entry-form">
         <div class="field"><label>วันที่ประเมิน</label><input type="date" id="fBehDate" value="${todayStr()}"></div>
-        <div class="field"><label>คะแนน (%)</label><input type="text" inputmode="decimal" id="fBehScore" placeholder="0-100"></div>
+        <div class="field"><label>คะแนนดิบ (เต็ม ${BEHAVIOR_MAX})</label><input type="text" inputmode="decimal" id="fBehScore" placeholder="0-${BEHAVIOR_MAX}"></div>
         <div class="field" style="flex:2;"><label>หมายเหตุ</label><input type="text" id="fBehNote" placeholder="เช่น ประเมินโดยหัวหน้าสาขา"></div>
         <button class="btn-primary btn-sm" onclick="addBehaviorEntry()">＋ บันทึก</button>
       </div>
-      ${entryListHtml(r.behaviorEntries, 'คะแนน', '%', 'behavior')}
+      ${behaviorEntryListHtml(r.behaviorEntries)}
     `;
   }
+}
+
+function behaviorEntryListHtml(entries) {
+  if (!entries.length) return `<div class="entry-list"><div class="entry-empty">ยังไม่มีรายการ — เพิ่มรายการแรกด้านบน (กรอกคะแนนดิบเต็ม ${BEHAVIOR_MAX})</div></div>`;
+  const sorted = [...entries].sort((a,b) => new Date(b['วันที่']) - new Date(a['วันที่']));
+  return `<div class="entry-list">${sorted.map(en => {
+    const raw = Number(en['คะแนน']) || 0;
+    const pct = raw / BEHAVIOR_MAX * 100;
+    return `
+    <div class="entry-row">
+      <div>
+        <span class="val">${fmt(raw)}/${BEHAVIOR_MAX}</span>
+        <span class="muted"> · ${fmt(pct,1)}%</span>
+        ${en['หมายเหตุ'] ? `<span class="muted"> · ${escapeHtml(en['หมายเหตุ'])}</span>` : ''}
+        <div class="date">${fmtDate(en['วันที่'])}</div>
+      </div>
+      <button class="btn-danger btn-sm" onclick="removeEntry('behavior','${en.ID}')">ลบ</button>
+    </div>`;
+  }).join('')}</div>`;
 }
 
 function entryListHtml(entries, valueField, unit, type) {
@@ -692,10 +713,11 @@ async function addBehaviorEntry() {
   const date = document.getElementById('fBehDate').value;
   const score = document.getElementById('fBehScore').value.trim();
   const note = document.getElementById('fBehNote').value.trim();
-  if (!score || isNaN(Number(score))) { toast('กรุณากรอกคะแนนพฤติกรรม', true); return; }
+  if (!score || isNaN(Number(score))) { toast('กรุณากรอกคะแนนพฤติกรรม (คะแนนดิบ เต็ม ' + BEHAVIOR_MAX + ')', true); return; }
+  if (Number(score) > BEHAVIOR_MAX) { toast('คะแนนดิบต้องไม่เกิน ' + BEHAVIOR_MAX, true); return; }
   try {
     await api('addBehavior', { empId: currentEmpId, date, score, note });
-    toast('บันทึกคะแนนพฤติกรรมแล้ว — อัปเดตค่าเฉลี่ยอัตโนมัติ');
+    toast('บันทึกคะแนนพฤติกรรมแล้ว (' + score + '/' + BEHAVIOR_MAX + ') — อัปเดตค่าเฉลี่ยอัตโนมัติ');
     await loadData();
     renderEmployeeModal();
   } catch (err) { toast(err.message, true); }
