@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>360° Sales Performance | Rayong Isuzu Sales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#111c33;
+  --navy-2:#1a2947;
+  --red:#e2231a;
+  --red-dark:#b91c14;
+  --bg:#f4f5f7;
+  --card:#ffffff;
+  --line:#e4e7ee;
+  --text:#1c2333;
+  --muted:#6b7280;
+  --gold:#c8930a;
+  --blue:#2563eb;
+  --orange:#d97706;
+  --purple:#7c3aed;
+  --gray:#64748b;
+  --green:#16a34a;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(17,28,51,.06),0 8px 24px -12px rgba(17,28,51,.12);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'Sarabun',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:#ffd9d6;}
+
+/* Header */
+header.top{
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);
+  color:#fff;
+  padding:18px 20px;
+  position:sticky;top:0;z-index:40;
+  box-shadow:0 6px 20px -10px rgba(0,0,0,.4);
+}
+.top-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand .dot{width:10px;height:10px;border-radius:50%;background:var(--red);box-shadow:0 0 0 4px rgba(226,35,26,.25);}
+.brand h1{font-size:17px;margin:0;font-weight:800;letter-spacing:.2px;}
+.brand small{display:block;font-size:11.5px;color:#b9c2d6;font-weight:500;margin-top:1px;}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+button{font-family:inherit;cursor:pointer;border:none;border-radius:10px;font-weight:600;transition:.15s;}
+.btn-primary{background:var(--red);color:#fff;padding:9px 16px;font-size:14px;}
+.btn-primary:hover{background:var(--red-dark);}
+.btn-ghost{background:rgba(255,255,255,.1);color:#fff;padding:9px 14px;font-size:14px;}
+.btn-ghost:hover{background:rgba(255,255,255,.18);}
+.btn-outline{background:#fff;color:var(--text);border:1px solid var(--line);padding:8px 14px;font-size:13.5px;}
+.btn-outline:hover{background:#f8f9fb;}
+.btn-danger{background:#fff;color:var(--red);border:1px solid #f3c9c6;padding:7px 12px;font-size:13px;}
+.btn-danger:hover{background:#fff3f2;}
+.btn-sm{padding:6px 10px;font-size:12.5px;border-radius:8px;}
+
+main{max-width:1280px;margin:0 auto;padding:20px;}
+
+/* Toolbar */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px;}
+.toolbar input[type=text],.toolbar select{
+  font-family:inherit;padding:9px 12px;border-radius:10px;border:1px solid var(--line);
+  font-size:13.5px;background:#fff;color:var(--text);
+}
+.toolbar input[type=text]{min-width:200px;flex:1;}
+.spacer{flex:1;}
+
+/* Stat cards */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:18px;}
+.stat{background:var(--card);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);}
+.stat b{display:block;font-size:22px;font-weight:800;}
+.stat span{font-size:12px;color:var(--muted);font-weight:600;}
+
+/* Table */
+.table-wrap{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow-x:auto;}
+table{width:100%;border-collapse:collapse;min-width:920px;}
+thead th{
+  text-align:left;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;
+  padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap;font-weight:700;
+  cursor:pointer;user-select:none;
+}
+thead th:hover{color:var(--text);}
+tbody td{padding:11px 14px;border-bottom:1px solid var(--line);font-size:13.5px;white-space:nowrap;}
+tbody tr{transition:.1s;}
+tbody tr:hover{background:#fafbfc;cursor:pointer;}
+tbody tr:last-child td{border-bottom:none;}
+.name-cell{font-weight:700;}
+.name-cell small{display:block;font-weight:500;color:var(--muted);font-size:11.5px;}
+.num{font-variant-numeric:tabular-nums;}
+.muted{color:var(--muted);}
+
+.badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;}
+.badge-star{background:#fdf3d8;color:var(--gold);}
+.badge-mid-hi{background:#dbeafe;color:var(--blue);}
+.badge-mid-lo{background:#ede9fe;color:var(--purple);}
+.badge-low-hi{background:#ffedd5;color:var(--orange);}
+.badge-hi-lo{background:#fce7f3;color:#be185d;}
+.badge-risk{background:#fee2e2;color:var(--red-dark);}
+
+.bar-wrap{width:70px;height:6px;background:#eef0f4;border-radius:99px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:6px;}
+.bar{height:100%;background:var(--red);border-radius:99px;}
+
+.empty-state{padding:60px 20px;text-align:center;color:var(--muted);}
+.empty-state b{display:block;color:var(--text);font-size:15px;margin-bottom:4px;}
+
+/* Modal */
+.overlay{position:fixed;inset:0;background:rgba(17,22,35,.55);backdrop-filter:blur(2px);z-index:100;display:flex;align-items:flex-end;justify-content:center;}
+@media(min-width:720px){.overlay{align-items:center;}}
+.modal{background:#fff;width:100%;max-width:720px;max-height:92vh;overflow-y:auto;border-radius:18px 18px 0 0;box-shadow:0 20px 60px rgba(0,0,0,.35);}
+@media(min-width:720px){.modal{border-radius:18px;}}
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:2;}
+.modal-head h2{margin:0;font-size:17px;}
+.modal-head p{margin:2px 0 0;font-size:12.5px;color:var(--muted);}
+.modal-close{background:none;color:var(--muted);font-size:20px;padding:4px 8px;}
+.modal-body{padding:18px 20px;}
+
+.field{margin-bottom:12px;}
+.field label{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:5px;}
+.field input,.field select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);font-family:inherit;font-size:14px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.field-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+@media(max-width:520px){.field-row3{grid-template-columns:1fr 1fr;}}
+
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0 18px;}
+@media(max-width:600px){.summary-grid{grid-template-columns:repeat(2,1fr);}}
+.summary-grid .box{background:var(--bg);border-radius:10px;padding:10px 12px;}
+.summary-grid .box b{display:block;font-size:16px;}
+.summary-grid .box span{font-size:11px;color:var(--muted);font-weight:600;}
+
+.tabs{display:flex;gap:4px;background:var(--bg);padding:4px;border-radius:10px;margin-bottom:14px;}
+.tab{flex:1;text-align:center;padding:8px 6px;border-radius:8px;font-size:13px;font-weight:700;color:var(--muted);background:transparent;}
+.tab.active{background:#fff;color:var(--text);box-shadow:var(--shadow);}
+
+.entry-form{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px;padding:12px;background:var(--bg);border-radius:10px;}
+.entry-form .field{margin-bottom:0;flex:1;min-width:110px;}
+.entry-list{border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+.entry-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;font-size:13.5px;border-bottom:1px solid var(--line);}
+.entry-row:last-child{border-bottom:none;}
+.entry-row .val{font-weight:700;}
+.entry-row .date{color:var(--muted);font-size:12px;}
+.entry-empty{padding:24px;text-align:center;color:var(--muted);font-size:13px;}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:11px 20px;border-radius:10px;font-size:13.5px;font-weight:600;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:.25s;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
+.toast.err{background:var(--red-dark);}
+
+.loading{display:flex;align-items:center;justify-content:center;padding:60px;color:var(--muted);gap:10px;font-size:13.5px;}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid #ddd;border-top-color:var(--red);animation:sp .7s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg);}}
+
+.footer-note{text-align:center;color:var(--muted);font-size:11.5px;padding:20px 0 30px;}
+.config-warn{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:12px 16px;border-radius:12px;font-size:13.5px;margin-bottom:16px;display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <span class="dot"></span>
+      <div>
+        <h1>360° Sales Performance</h1>
+        <small>Rayong Isuzu Sales · Training Dept</small>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="btn-ghost" id="btnSettings">⚙ ตั้งค่า</button>
+      <button class="btn-primary" id="btnAddEmp">＋ เพิ่มพนักงาน</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div id="configWarn" class="config-warn" style="display:none;">
+    <span>⚠ ยังไม่ได้เชื่อมต่อ Google Sheets — กดปุ่ม "ตั้งค่า" เพื่อใส่ Web App URL</span>
+    <button class="btn-outline btn-sm" id="btnConfigNow">ตั้งค่าเลย</button>
+  </div>
+
+  <div class="stats" id="statsRow"></div>
+
+  <div class="toolbar">
+    <input type="text" id="searchBox" placeholder="ค้นหาชื่อพนักงาน...">
+    <select id="branchFilter"><option value="">ทุกสาขา</option></select>
+    <select id="groupFilter">
+      <option value="">ทุกกลุ่ม</option>
+      <option value="Star">Star</option>
+      <option value="ขายสูง/รู้ต่ำ">ขายสูง/รู้ต่ำ</option>
+      <option value="ขายกลาง/รู้สูง">ขายกลาง/รู้สูง</option>
+      <option value="ขายกลาง/รู้ต่ำ">ขายกลาง/รู้ต่ำ</option>
+      <option value="ขายต่ำ/รู้สูง">ขายต่ำ/รู้สูง</option>
+      <option value="At Risk">At Risk</option>
+    </select>
+    <div class="spacer"></div>
+    <button class="btn-outline" id="btnRefresh">↻ รีเฟรช</button>
+  </div>
+
+  <div class="table-wrap">
+    <table id="mainTable">
+      <thead>
+        <tr>
+          <th data-sort="name">พนักงาน</th>
+          <th data-sort="branch">สาขา</th>
+          <th data-sort="target">เป้า</th>
+          <th data-sort="actual">ยอดขาย</th>
+          <th data-sort="pct">%ยอด</th>
+          <th data-sort="salesScore">คะแนนขาย/50</th>
+          <th data-sort="examAvg">ความรู้เฉลี่ย%</th>
+          <th data-sort="examCount">ครั้งสอบ</th>
+          <th data-sort="behaviorAvg">พฤติกรรมเฉลี่ย%</th>
+          <th data-sort="behaviorCount">ครั้งประเมิน</th>
+          <th data-sort="total">คะแนนรวม/100</th>
+          <th data-sort="group">กลุ่ม</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr><td colspan="12"><div class="loading"><div class="spin"></div>กำลังโหลดข้อมูล...</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="footer-note">น้ำหนักคะแนน: ยอดขาย 50 · ความรู้ 30 · พฤติกรรม 20 (รวม 100) — คะแนนขาย = %ยอดขาย÷2 (สูงสุด 50)</p>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= CONFIG ================= */
+let CONFIG = {
+  url: '',
+  pin: '7151'
+};
+try {
+  const saved = JSON.parse(localStorage.getItem('sp360_config') || '{}');
+  CONFIG = Object.assign(CONFIG, saved);
+} catch (e) {}
+
+function saveConfig() {
+  try { localStorage.setItem('sp360_config', JSON.stringify(CONFIG)); } catch (e) {}
+}
+
+/* ================= STATE ================= */
+let DATA = { employees: [], sales: [], exams: [], behaviors: [] };
+let SORT = { key: 'total', dir: 'desc' };
+let currentEmpId = null;
+let currentTab = 'sales';
+
+/* ================= HELPERS ================= */
+function toast(msg, isErr) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isErr ? ' err' : '');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function fmt(n, d) {
+  if (n === undefined || n === null || isNaN(n)) return '-';
+  return Number(n).toLocaleString('th-TH', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 });
+}
+
+function fmtDate(d) {
+  if (!d) return '-';
+  const dt = new Date(d);
+  if (isNaN(dt.getTime())) return d;
+  return dt.toLocaleDateString('th-TH', { day: '2-digit', month: 'short', year: '2-digit' });
+}
+
+function todayStr() {
+  const d = new Date();
+  const off = d.getTimezoneOffset();
+  return new Date(d.getTime() - off * 60000).toISOString().slice(0, 10);
+}
+
+async function api(action, params) {
+  if (!CONFIG.url) { toast('กรุณาตั้งค่า Web App URL ก่อน', true); throw new Error('no url'); }
+  const q = new URLSearchParams(Object.assign({ action }, params || {}));
+  const res = await fetch(CONFIG.url + '?' + q.toString(), { method: 'GET' });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error || 'เกิดข้อผิดพลาด');
+  return json.data;
+}
+
+function askPin(cb) {
+  const p = prompt('กรอกรหัส PIN เพื่อยืนยัน');
+  if (p === null) return;
+  if (p !== CONFIG.pin) { toast('รหัส PIN ไม่ถูกต้อง', true); return; }
+  cb();
+}
+
+/* ================= CALCULATIONS ================= */
+function calcEmployee(emp) {
+  const eSales = DATA.sales.filter(s => s.EmployeeID === emp.ID);
+  const eExams = DATA.exams.filter(x => x.EmployeeID === emp.ID);
+  const eBehaviors = DATA.behaviors.filter(x => x.EmployeeID === emp.ID);
+
+  const target = Number(emp['เป้าขาย']) || 0;
+  const actual = eSales.reduce((s, r) => s + (Number(r['จำนวน']) || 0), 0);
+  const pct = target > 0 ? (actual / target * 100) : 0;
+  const salesScore = Math.min(pct * 0.5, 50);
+
+  const examCount = eExams.length;
+  const examAvg = examCount ? eExams.reduce((s, r) => s + (Number(r['คะแนน']) || 0), 0) / examCount : 0;
+  const knowledgeScore = examAvg * 0.3;
+
+  const behaviorCount = eBehaviors.length;
+  const behaviorAvg = behaviorCount ? eBehaviors.reduce((s, r) => s + (Number(r['คะแนน']) || 0), 0) / behaviorCount : 0;
+  const behaviorScore = behaviorAvg * 0.2;
+
+  const total = salesScore + knowledgeScore + behaviorScore;
+  const group = classify(pct, examAvg);
+
+  return {
+    id: emp.ID, name: emp['ชื่อ-นามสกุล'], branch: emp['สาขา'] || '-',
+    target, actual, pct, salesScore,
+    examCount, examAvg, knowledgeScore,
+    behaviorCount, behaviorAvg, behaviorScore,
+    total, group,
+    salesEntries: eSales, examEntries: eExams, behaviorEntries: eBehaviors
+  };
+}
+
+function classify(F, H) {
+  if (F >= 100 && H >= 70) return 'Star';
+  if (F >= 100 && H < 70) return 'ขายสูง/รู้ต่ำ';
+  if (F >= 66.66 && F < 100 && H >= 70) return 'ขายกลาง/รู้สูง';
+  if (F >= 66.66 && F < 100 && H < 70) return 'ขายกลาง/รู้ต่ำ';
+  if (F < 66.66 && H >= 70) return 'ขายต่ำ/รู้สูง';
+  return 'At Risk';
+}
+
+function badgeClass(group) {
+  return {
+    'Star': 'badge-star',
+    'ขายกลาง/รู้สูง': 'badge-mid-hi',
+    'ขายกลาง/รู้ต่ำ': 'badge-mid-lo',
+    'ขายต่ำ/รู้สูง': 'badge-low-hi',
+    'ขายสูง/รู้ต่ำ': 'badge-hi-lo',
+    'At Risk': 'badge-risk'
+  }[group] || 'badge-risk';
+}
+
+/* ================= RENDER ================= */
+function renderAll() {
+  document.getElementById('configWarn').style.display = CONFIG.url ? 'none' : 'flex';
+  renderBranchFilter();
+  renderStats();
+  renderTable();
+}
+
+function renderBranchFilter() {
+  const sel = document.getElementById('branchFilter');
+  const current = sel.value;
+  const branches = [...new Set(DATA.employees.map(e => e['สาขา']).filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">ทุกสาขา</option>' + branches.map(b => `<option value="${b}">${b}</option>`).join('');
+  sel.value = current;
+}
+
+function renderStats() {
+  const rows = DATA.employees.map(calcEmployee);
+  const total = rows.length;
+  const star = rows.filter(r => r.group === 'Star').length;
+  const risk = rows.filter(r => r.group === 'At Risk').length;
+  const avgTotal = total ? (rows.reduce((s, r) => s + r.total, 0) / total) : 0;
+  const el = document.getElementById('statsRow');
+  el.innerHTML = `
+    <div class="stat"><b>${total}</b><span>พนักงานทั้งหมด</span></div>
+    <div class="stat"><b style="color:var(--gold)">${star}</b><span>⭐ Star</span></div>
+    <div class="stat"><b style="color:var(--red-dark)">${risk}</b><span>At Risk</span></div>
+    <div class="stat"><b>${fmt(avgTotal,1)}</b><span>คะแนนเฉลี่ย /100</span></div>
+  `;
+}
+
+function getFilteredSorted() {
+  const q = document.getElementById('searchBox').value.trim().toLowerCase();
+  const branch = document.getElementById('branchFilter').value;
+  const group = document.getElementById('groupFilter').value;
+
+  let rows = DATA.employees.map(calcEmployee);
+  if (q) rows = rows.filter(r => (r.name || '').toLowerCase().includes(q));
+  if (branch) rows = rows.filter(r => r.branch === branch);
+  if (group) rows = rows.filter(r => r.group === group);
+
+  rows.sort((a, b) => {
+    let av = a[SORT.key], bv = b[SORT.key];
+    if (typeof av === 'string') { av = av || ''; bv = bv || ''; return SORT.dir === 'asc' ? av.localeCompare(bv, 'th') : bv.localeCompare(av, 'th'); }
+    return SORT.dir === 'asc' ? av - bv : bv - av;
+  });
+  return rows;
+}
+
+function renderTable() {
+  const rows = getFilteredSorted();
+  const tbody = document.getElementById('tbody');
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="12"><div class="empty-state"><b>ยังไม่มีข้อมูล</b>เพิ่มพนักงานคนแรกด้วยปุ่ม "เพิ่มพนักงาน" ด้านบน</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(r => `
+    <tr onclick="openEmployee('${r.id}')">
+      <td class="name-cell">${escapeHtml(r.name)}</td>
+      <td class="muted">${escapeHtml(r.branch)}</td>
+      <td class="num">${fmt(r.target)}</td>
+      <td class="num">${fmt(r.actual)}</td>
+      <td class="num">
+        <span class="bar-wrap"><span class="bar" style="width:${Math.min(r.pct,100)}%"></span></span>${fmt(r.pct,0)}%
+      </td>
+      <td class="num">${fmt(r.salesScore,1)}</td>
+      <td class="num">${r.examCount ? fmt(r.examAvg,1)+'%' : '<span class="muted">-</span>'}</td>
+      <td class="num muted">${r.examCount} ครั้ง</td>
+      <td class="num">${r.behaviorCount ? fmt(r.behaviorAvg,1)+'%' : '<span class="muted">-</span>'}</td>
+      <td class="num muted">${r.behaviorCount} ครั้ง</td>
+      <td class="num" style="font-weight:800;">${fmt(r.total,1)}</td>
+      <td><span class="badge ${badgeClass(r.group)}">${r.group}</span></td>
+    </tr>
+  `).join('');
+}
+
+function escapeHtml(s) {
+  return (s || '').toString().replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+/* Sorting */
+document.querySelectorAll('#mainTable thead th').forEach(th => {
+  th.addEventListener('click', () => {
+    const key = th.dataset.sort;
+    if (SORT.key === key) SORT.dir = SORT.dir === 'asc' ? 'desc' : 'asc';
+    else { SORT.key = key; SORT.dir = 'desc'; }
+    renderTable();
+  });
+});
+
+['searchBox','branchFilter','groupFilter'].forEach(id => {
+  document.getElementById(id).addEventListener('input', renderTable);
+  document.getElementById(id).addEventListener('change', renderTable);
+});
+
+/* ================= DATA LOAD ================= */
+async function loadData() {
+  if (!CONFIG.url) { renderAll(); return; }
+  try {
+    document.getElementById('tbody').innerHTML = `<tr><td colspan="12"><div class="loading"><div class="spin"></div>กำลังโหลดข้อมูล...</div></td></tr>`;
+    const data = await api('getAll');
+    DATA = data;
+    renderAll();
+  } catch (err) {
+    toast('โหลดข้อมูลไม่สำเร็จ: ' + err.message, true);
+    document.getElementById('tbody').innerHTML = `<tr><td colspan="12"><div class="empty-state"><b>โหลดข้อมูลไม่สำเร็จ</b>${escapeHtml(err.message)}</div></td></tr>`;
+  }
+}
+
+document.getElementById('btnRefresh').addEventListener('click', loadData);
+
+/* ================= SETTINGS MODAL ================= */
+function openSettings() {
+  const html = `
+    <div class="modal">
+      <div class="modal-head">
+        <div><h2>⚙ ตั้งค่าระบบ</h2><p>เชื่อมต่อ Google Sheets ผ่าน Apps Script Web App</p></div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label>Web App URL (ลงท้ายด้วย /exec)</label>
+          <input type="text" id="cfgUrl" placeholder="https://script.google.com/macros/s/xxxx/exec" value="${escapeHtml(CONFIG.url)}">
+        </div>
+        <div class="field">
+          <label>รหัส PIN สำหรับแก้ไข/ลบข้อมูล</label>
+          <input type="text" id="cfgPin" value="${escapeHtml(CONFIG.pin)}">
+        </div>
+        <button class="btn-primary" style="width:100%;padding:11px;" onclick="saveSettings()">บันทึกการตั้งค่า</button>
+      </div>
+    </div>
+  `;
+  showOverlay(html);
+}
+function saveSettings() {
+  CONFIG.url = document.getElementById('cfgUrl').value.trim();
+  CONFIG.pin = document.getElementById('cfgPin').value.trim() || '7151';
+  saveConfig();
+  closeModal();
+  toast('บันทึกการตั้งค่าแล้ว');
+  loadData();
+}
+document.getElementById('btnSettings').addEventListener('click', openSettings);
+document.getElementById('btnConfigNow').addEventListener('click', openSettings);
+
+/* ================= ADD EMPLOYEE MODAL ================= */
+function openAddEmployee() {
+  const html = `
+    <div class="modal">
+      <div class="modal-head">
+        <div><h2>เพิ่มพนักงาน</h2><p>กรอกข้อมูลพนักงานใหม่</p></div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field"><label>ชื่อ-นามสกุล</label><input type="text" id="newName" placeholder="เช่น สมชาย ใจดี"></div>
+        <div class="field-row">
+          <div class="field"><label>สาขา</label><input type="text" id="newBranch" placeholder="เช่น สาขาระยอง 1"></div>
+          <div class="field"><label>เป้าขาย (คัน)</label><input type="text" inputmode="numeric" id="newTarget" placeholder="18"></div>
+        </div>
+        <button class="btn-primary" style="width:100%;padding:11px;" onclick="submitAddEmployee()">＋ เพิ่มพนักงาน</button>
+      </div>
+    </div>
+  `;
+  showOverlay(html);
+}
+async function submitAddEmployee() {
+  const name = document.getElementById('newName').value.trim();
+  const branch = document.getElementById('newBranch').value.trim();
+  const target = document.getElementById('newTarget').value.trim();
+  if (!name) { toast('กรุณากรอกชื่อพนักงาน', true); return; }
+  try {
+    await api('addEmployee', { name, branch, target: target || 0 });
+    closeModal();
+    toast('เพิ่มพนักงานเรียบร้อย');
+    await loadData();
+  } catch (err) { toast(err.message, true); }
+}
+document.getElementById('btnAddEmp').addEventListener('click', openAddEmployee);
+
+/* ================= EMPLOYEE DETAIL MODAL ================= */
+function openEmployee(id) {
+  currentEmpId = id;
+  currentTab = 'sales';
+  renderEmployeeModal();
+}
+
+function renderEmployeeModal() {
+  const emp = DATA.employees.find(e => e.ID === currentEmpId);
+  if (!emp) { closeModal(); return; }
+  const r = calcEmployee(emp);
+
+  const html = `
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h2>${escapeHtml(r.name)}</h2>
+          <p>${escapeHtml(r.branch)} · เป้าขาย ${fmt(r.target)} คัน</p>
+        </div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <div class="field-row3" style="margin-bottom:14px;">
+          <div class="field"><label>ชื่อ-นามสกุล</label><input type="text" id="editName" value="${escapeHtml(r.name)}"></div>
+          <div class="field"><label>สาขา</label><input type="text" id="editBranch" value="${escapeHtml(emp['สาขา']||'')}"></div>
+          <div class="field"><label>เป้าขาย (คัน)</label><input type="text" inputmode="numeric" id="editTarget" value="${r.target}"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+          <button class="btn-outline btn-sm" onclick="saveEmployeeEdit()">💾 บันทึกข้อมูลพนักงาน</button>
+          <button class="btn-danger btn-sm" onclick="removeEmployee('${r.id}')">🗑 ลบพนักงานนี้</button>
+        </div>
+
+        <div class="summary-grid">
+          <div class="box"><b>${fmt(r.pct,0)}%</b><span>%ยอดขาย</span></div>
+          <div class="box"><b>${fmt(r.salesScore,1)}/50</b><span>คะแนนขาย</span></div>
+          <div class="box"><b>${fmt(r.knowledgeScore,1)}/30</b><span>คะแนนความรู้</span></div>
+          <div class="box"><b>${fmt(r.behaviorScore,1)}/20</b><span>คะแนนพฤติกรรม</span></div>
+        </div>
+        <div style="text-align:center;margin:-8px 0 16px;">
+          <span class="badge ${badgeClass(r.group)}" style="font-size:14px;padding:6px 16px;">${r.group} · รวม ${fmt(r.total,1)}/100</span>
+        </div>
+
+        <div class="tabs">
+          <button class="tab ${currentTab==='sales'?'active':''}" onclick="switchTab('sales')">🚗 ยอดขาย</button>
+          <button class="tab ${currentTab==='exam'?'active':''}" onclick="switchTab('exam')">📝 ผลสอบ</button>
+          <button class="tab ${currentTab==='behavior'?'active':''}" onclick="switchTab('behavior')">🤝 พฤติกรรม</button>
+        </div>
+
+        <div id="tabContent"></div>
+      </div>
+    </div>
+  `;
+  showOverlay(html);
+  renderTabContent(r);
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  renderEmployeeModal();
+}
+
+function renderTabContent(r) {
+  const el = document.getElementById('tabContent');
+  if (currentTab === 'sales') {
+    el.innerHTML = `
+      <div class="entry-form">
+        <div class="field"><label>วันที่</label><input type="date" id="fSalesDate" value="${todayStr()}"></div>
+        <div class="field"><label>จำนวน (คัน)</label><input type="text" inputmode="numeric" id="fSalesQty" placeholder="1"></div>
+        <div class="field" style="flex:2;"><label>หมายเหตุ</label><input type="text" id="fSalesNote" placeholder="เช่น รุ่น MU-X"></div>
+        <button class="btn-primary btn-sm" onclick="addSalesEntry()">＋ บันทึก</button>
+      </div>
+      ${entryListHtml(r.salesEntries, 'จำนวน', 'คัน', 'sales')}
+    `;
+  } else if (currentTab === 'exam') {
+    el.innerHTML = `
+      <div class="entry-form">
+        <div class="field"><label>วันที่สอบ</label><input type="date" id="fExamDate" value="${todayStr()}"></div>
+        <div class="field"><label>คะแนน (%)</label><input type="text" inputmode="decimal" id="fExamScore" placeholder="0-100"></div>
+        <div class="field" style="flex:2;"><label>หมายเหตุ</label><input type="text" id="fExamNote" placeholder="เช่น รอบที่ 2"></div>
+        <button class="btn-primary btn-sm" onclick="addExamEntry()">＋ บันทึก</button>
+      </div>
+      ${entryListHtml(r.examEntries, 'คะแนน', '%', 'exam')}
+    `;
+  } else {
+    el.innerHTML = `
+      <div class="entry-form">
+        <div class="field"><label>วันที่ประเมิน</label><input type="date" id="fBehDate" value="${todayStr()}"></div>
+        <div class="field"><label>คะแนน (%)</label><input type="text" inputmode="decimal" id="fBehScore" placeholder="0-100"></div>
+        <div class="field" style="flex:2;"><label>หมายเหตุ</label><input type="text" id="fBehNote" placeholder="เช่น ประเมินโดยหัวหน้าสาขา"></div>
+        <button class="btn-primary btn-sm" onclick="addBehaviorEntry()">＋ บันทึก</button>
+      </div>
+      ${entryListHtml(r.behaviorEntries, 'คะแนน', '%', 'behavior')}
+    `;
+  }
+}
+
+function entryListHtml(entries, valueField, unit, type) {
+  if (!entries.length) return `<div class="entry-list"><div class="entry-empty">ยังไม่มีรายการ — เพิ่มรายการแรกด้านบน</div></div>`;
+  const sorted = [...entries].sort((a,b) => new Date(b['วันที่']) - new Date(a['วันที่']));
+  return `<div class="entry-list">${sorted.map(en => `
+    <div class="entry-row">
+      <div>
+        <span class="val">${fmt(en[valueField])} ${unit}</span>
+        ${en['หมายเหตุ'] ? `<span class="muted"> · ${escapeHtml(en['หมายเหตุ'])}</span>` : ''}
+        <div class="date">${fmtDate(en['วันที่'])}</div>
+      </div>
+      <button class="btn-danger btn-sm" onclick="removeEntry('${type}','${en.ID}')">ลบ</button>
+    </div>
+  `).join('')}</div>`;
+}
+
+async function saveEmployeeEdit() {
+  const name = document.getElementById('editName').value.trim();
+  const branch = document.getElementById('editBranch').value.trim();
+  const target = document.getElementById('editTarget').value.trim();
+  if (!name) { toast('กรุณากรอกชื่อพนักงาน', true); return; }
+  try {
+    await api('updateEmployee', { id: currentEmpId, name, branch, target: target || 0 });
+    toast('บันทึกข้อมูลแล้ว');
+    await loadData();
+    renderEmployeeModal();
+  } catch (err) { toast(err.message, true); }
+}
+
+function removeEmployee(id) {
+  askPin(async () => {
+    try {
+      await api('deleteEmployee', { id });
+      closeModal();
+      toast('ลบพนักงานแล้ว');
+      await loadData();
+    } catch (err) { toast(err.message, true); }
+  });
+}
+
+async function addSalesEntry() {
+  const date = document.getElementById('fSalesDate').value;
+  const qty = document.getElementById('fSalesQty').value.trim();
+  const note = document.getElementById('fSalesNote').value.trim();
+  if (!qty || isNaN(Number(qty))) { toast('กรุณากรอกจำนวนคัน', true); return; }
+  try {
+    await api('addSales', { empId: currentEmpId, date, qty, note });
+    toast('บันทึกยอดขายแล้ว');
+    await loadData();
+    renderEmployeeModal();
+  } catch (err) { toast(err.message, true); }
+}
+
+async function addExamEntry() {
+  const date = document.getElementById('fExamDate').value;
+  const score = document.getElementById('fExamScore').value.trim();
+  const note = document.getElementById('fExamNote').value.trim();
+  if (!score || isNaN(Number(score))) { toast('กรุณากรอกคะแนนสอบ', true); return; }
+  try {
+    await api('addExam', { empId: currentEmpId, date, score, note });
+    toast('บันทึกผลสอบแล้ว — อัปเดตค่าเฉลี่ยและจำนวนครั้งอัตโนมัติ');
+    await loadData();
+    renderEmployeeModal();
+  } catch (err) { toast(err.message, true); }
+}
+
+async function addBehaviorEntry() {
+  const date = document.getElementById('fBehDate').value;
+  const score = document.getElementById('fBehScore').value.trim();
+  const note = document.getElementById('fBehNote').value.trim();
+  if (!score || isNaN(Number(score))) { toast('กรุณากรอกคะแนนพฤติกรรม', true); return; }
+  try {
+    await api('addBehavior', { empId: currentEmpId, date, score, note });
+    toast('บันทึกคะแนนพฤติกรรมแล้ว — อัปเดตค่าเฉลี่ยอัตโนมัติ');
+    await loadData();
+    renderEmployeeModal();
+  } catch (err) { toast(err.message, true); }
+}
+
+function removeEntry(type, id) {
+  askPin(async () => {
+    try {
+      await api('deleteEntry', { type, id });
+      toast('ลบรายการแล้ว');
+      await loadData();
+      renderEmployeeModal();
+    } catch (err) { toast(err.message, true); }
+  });
+}
+
+/* ================= MODAL HELPERS ================= */
+function showOverlay(html) {
+  closeModal();
+  const div = document.createElement('div');
+  div.className = 'overlay';
+  div.id = 'activeOverlay';
+  div.innerHTML = html;
+  div.addEventListener('click', (e) => { if (e.target === div) closeModal(); });
+  document.body.appendChild(div);
+}
+function closeModal() {
+  const el = document.getElementById('activeOverlay');
+  if (el) el.remove();
+}
+
+/* ================= INIT ================= */
+loadData();
+</script>
+</body>
+</html>
