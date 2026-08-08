@@ -214,7 +214,7 @@ tbody tr:last-child td{border-bottom:none;}
           <th data-sort="salesScore">คะแนนขาย/50</th>
           <th data-sort="examAvg">ความรู้เฉลี่ย%</th>
           <th data-sort="examCount">ครั้งสอบ</th>
-          <th data-sort="behaviorAvg">พฤติกรรมเฉลี่ย%</th>
+          <th data-sort="behaviorScore">คะแนนพฤติกรรม/20</th>
           <th data-sort="behaviorCount">ครั้งประเมิน</th>
           <th data-sort="total">คะแนนรวม/100</th>
           <th data-sort="group">กลุ่ม</th>
@@ -417,7 +417,7 @@ function renderTable() {
       <td class="num">${fmt(r.salesScore,2)}</td>
       <td class="num">${r.examCount ? fmt(r.examAvg,2)+'%' : '<span class="muted">-</span>'}</td>
       <td class="num muted">${r.examCount} ครั้ง</td>
-      <td class="num">${r.behaviorCount ? fmt(r.behaviorAvg,2)+'%' : '<span class="muted">-</span>'}</td>
+      <td class="num">${r.behaviorCount ? fmt(r.behaviorScore,2) : '<span class="muted">-</span>'}</td>
       <td class="num muted">${r.behaviorCount} ครั้ง</td>
       <td class="num" style="font-weight:800;">${fmt(r.total,2)}</td>
       <td><span class="badge ${badgeClass(r.group)}">${r.group}</span></td>
