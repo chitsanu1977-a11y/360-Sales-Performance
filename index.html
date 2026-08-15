@@ -95,6 +95,10 @@ tbody tr:last-child td{border-bottom:none;}
 .name-cell{font-weight:700;}
 .name-cell small{display:block;font-weight:500;color:var(--muted);font-size:11.5px;}
 .num{font-variant-numeric:tabular-nums;}
+.sticky-col{position:sticky;left:0;background:var(--card);z-index:3;min-width:140px;box-shadow:2px 0 4px -2px rgba(0,0,0,.08);}
+.sticky-col-2{position:sticky;left:140px;background:var(--card);z-index:3;box-shadow:2px 0 4px -2px rgba(0,0,0,.08);}
+thead th.sticky-col,thead th.sticky-col-2{background:#fff;z-index:4;}
+tbody tr:hover .sticky-col,tbody tr:hover .sticky-col-2{background:#fafbfc;}
 .muted{color:var(--muted);}
 
 .badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;}
@@ -206,7 +210,9 @@ tbody tr:last-child td{border-bottom:none;}
     <table id="mainTable">
       <thead>
         <tr>
-          <th data-sort="name">พนักงาน</th>
+          <th data-sort="name" class="sticky-col">พนักงาน</th>
+          <th data-sort="total" class="sticky-col-2">คะแนนรวม/100</th>
+          <th data-sort="group">กลุ่ม</th>
           <th data-sort="branch">สาขา</th>
           <th data-sort="target">เป้า</th>
           <th data-sort="actual">ยอดขาย</th>
@@ -218,8 +224,6 @@ tbody tr:last-child td{border-bottom:none;}
           <th data-sort="examCount">ครั้งสอบ</th>
           <th data-sort="behaviorScore">คะแนนพฤติกรรม/10</th>
           <th data-sort="behaviorCount">ครั้งประเมิน</th>
-          <th data-sort="total">คะแนนรวม/100</th>
-          <th data-sort="group">กลุ่ม</th>
         </tr>
       </thead>
       <tbody id="tbody">
@@ -419,7 +423,9 @@ function renderTable() {
   }
   tbody.innerHTML = rows.map(r => `
     <tr onclick="openEmployee('${r.id}')">
-      <td class="name-cell">${escapeHtml(r.name)}</td>
+      <td class="name-cell sticky-col">${escapeHtml(r.name)}</td>
+      <td class="num sticky-col-2" style="font-weight:800;">${fmt(r.total,2)}</td>
+      <td><span class="badge ${badgeClass(r.group)}">${r.group}</span></td>
       <td class="muted">${escapeHtml(r.branch)}</td>
       <td class="num">${fmt(r.target)}</td>
       <td class="num">${fmt(r.actual)}</td>
@@ -433,8 +439,6 @@ function renderTable() {
       <td class="num muted">${r.examCount} ครั้ง</td>
       <td class="num">${r.behaviorCount ? fmt(r.behaviorScore,2) : '<span class="muted">-</span>'}</td>
       <td class="num muted">${r.behaviorCount} ครั้ง</td>
-      <td class="num" style="font-weight:800;">${fmt(r.total,2)}</td>
-      <td><span class="badge ${badgeClass(r.group)}">${r.group}</span></td>
     </tr>
   `).join('');
 }
