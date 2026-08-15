@@ -81,7 +81,7 @@ main{max-width:1280px;margin:0 auto;padding:20px;}
 
 /* Table */
 .table-wrap{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow-x:auto;}
-table{width:100%;border-collapse:collapse;min-width:920px;}
+table{width:100%;border-collapse:collapse;min-width:1180px;}
 thead th{
   text-align:left;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;
   padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap;font-weight:700;
@@ -129,8 +129,8 @@ tbody tr:last-child td{border-bottom:none;}
 .field-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
 @media(max-width:520px){.field-row3{grid-template-columns:1fr 1fr;}}
 
-.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0 18px;}
-@media(max-width:600px){.summary-grid{grid-template-columns:repeat(2,1fr);}}
+.summary-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0 18px;}
+@media(max-width:700px){.summary-grid{grid-template-columns:repeat(2,1fr);}}
 .summary-grid .box{background:var(--bg);border-radius:10px;padding:10px 12px;}
 .summary-grid .box b{display:block;font-size:16px;}
 .summary-grid .box span{font-size:11px;color:var(--muted);font-weight:600;}
@@ -212,21 +212,23 @@ tbody tr:last-child td{border-bottom:none;}
           <th data-sort="actual">ยอดขาย</th>
           <th data-sort="pct">%ยอด</th>
           <th data-sort="salesScore">คะแนนขาย/50</th>
+          <th data-sort="ssiScore">คะแนน SSI/20</th>
+          <th data-sort="ssiCount">ครั้ง SSI</th>
           <th data-sort="examAvg">ความรู้เฉลี่ย%</th>
           <th data-sort="examCount">ครั้งสอบ</th>
-          <th data-sort="behaviorScore">คะแนนพฤติกรรม/20</th>
+          <th data-sort="behaviorScore">คะแนนพฤติกรรม/10</th>
           <th data-sort="behaviorCount">ครั้งประเมิน</th>
           <th data-sort="total">คะแนนรวม/100</th>
           <th data-sort="group">กลุ่ม</th>
         </tr>
       </thead>
       <tbody id="tbody">
-        <tr><td colspan="12"><div class="loading"><div class="spin"></div>กำลังโหลดข้อมูล...</div></td></tr>
+        <tr><td colspan="14"><div class="loading"><div class="spin"></div>กำลังโหลดข้อมูล...</div></td></tr>
       </tbody>
     </table>
   </div>
 
-  <p class="footer-note">น้ำหนักคะแนน: ยอดขาย 50 · ความรู้ 30 · พฤติกรรม 20 (รวม 100) — คะแนนขาย = %ยอดขาย÷2 (สูงสุด 50) · ผลสอบกรอกเป็น % (0-100) · พฤติกรรมกรอกเป็นคะแนนดิบเต็ม 84 (ระบบแปลงเป็น % ให้อัตโนมัติ)</p>
+  <p class="footer-note">น้ำหนักคะแนน: ยอดขาย 50 · SSI 20 · ความรู้ 20 · พฤติกรรม 10 (รวม 100) — คะแนนขาย = %ยอดขาย÷2 (สูงสุด 50) · ผลสอบกรอกเป็น % (0-100) · SSI กรอกเป็นคะแนนดิบเต็ม 10.00 · พฤติกรรมกรอกเป็นคะแนนดิบเต็ม 84 (ระบบแปลงเป็น % ให้อัตโนมัติ)</p>
 </main>
 
 <div class="toast" id="toast"></div>
@@ -248,7 +250,10 @@ function saveConfig() {
 
 /* ================= STATE ================= */
 const BEHAVIOR_MAX = 84; // คะแนนพฤติกรรมดิบเต็ม 84 คะแนน -> แปลงเป็น % อัตโนมัติ
-let DATA = { employees: [], sales: [], exams: [], behaviors: [] };
+const SSI_MAX = 10;      // คะแนน SSI ดิบเต็ม 10.00 คะแนน -> แปลงเป็น % อัตโนมัติ
+// น้ำหนักคะแนนรวม 100: ยอดขาย 50 · SSI 20 · ความรู้ 20 · พฤติกรรม 10
+const WEIGHTS = { sales: 50, ssi: 0.20, knowledge: 0.20, behavior: 0.10 };
+let DATA = { employees: [], sales: [], exams: [], behaviors: [], ssi: [] };
 let SORT = { key: 'total', dir: 'desc' };
 let currentEmpId = null;
 let currentTab = 'sales';
@@ -301,22 +306,28 @@ function calcEmployee(emp) {
   const eSales = DATA.sales.filter(s => s.EmployeeID === emp.ID);
   const eExams = DATA.exams.filter(x => x.EmployeeID === emp.ID);
   const eBehaviors = DATA.behaviors.filter(x => x.EmployeeID === emp.ID);
+  const eSSI = DATA.ssi.filter(x => x.EmployeeID === emp.ID);
 
   const target = Number(emp['เป้าขาย']) || 0;
   const actual = eSales.reduce((s, r) => s + (Number(r['จำนวน']) || 0), 0);
   const pct = target > 0 ? (actual / target * 100) : 0;
-  const salesScore = Math.min(pct * 0.5, 50);
+  const salesScore = Math.min(pct * 0.5, WEIGHTS.sales);
 
   const examCount = eExams.length;
   const examAvg = examCount ? eExams.reduce((s, r) => s + (Number(r['คะแนน']) || 0), 0) / examCount : 0;
-  const knowledgeScore = examAvg * 0.3;
+  const knowledgeScore = examAvg * WEIGHTS.knowledge;
 
   const behaviorCount = eBehaviors.length;
   const behaviorAvgRaw = behaviorCount ? eBehaviors.reduce((s, r) => s + (Number(r['คะแนน']) || 0), 0) / behaviorCount : 0;
   const behaviorAvg = behaviorAvgRaw / BEHAVIOR_MAX * 100; // แปลงจากคะแนนดิบ/84 เป็น %
-  const behaviorScore = behaviorAvg * 0.2;
+  const behaviorScore = behaviorAvg * WEIGHTS.behavior;
 
-  const total = salesScore + knowledgeScore + behaviorScore;
+  const ssiCount = eSSI.length;
+  const ssiAvgRaw = ssiCount ? eSSI.reduce((s, r) => s + (Number(r['คะแนน']) || 0), 0) / ssiCount : 0;
+  const ssiAvg = ssiAvgRaw / SSI_MAX * 100; // แปลงจากคะแนนดิบ/10 เป็น %
+  const ssiScore = ssiAvg * WEIGHTS.ssi;
+
+  const total = salesScore + knowledgeScore + behaviorScore + ssiScore;
   const group = classify(pct, examAvg);
 
   return {
@@ -324,8 +335,9 @@ function calcEmployee(emp) {
     target, actual, pct, salesScore,
     examCount, examAvg, knowledgeScore,
     behaviorCount, behaviorAvg, behaviorScore,
+    ssiCount, ssiAvg, ssiScore,
     total, group,
-    salesEntries: eSales, examEntries: eExams, behaviorEntries: eBehaviors
+    salesEntries: eSales, examEntries: eExams, behaviorEntries: eBehaviors, ssiEntries: eSSI
   };
 }
 
@@ -402,7 +414,7 @@ function renderTable() {
   const rows = getFilteredSorted();
   const tbody = document.getElementById('tbody');
   if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="12"><div class="empty-state"><b>ยังไม่มีข้อมูล</b>เพิ่มพนักงานคนแรกด้วยปุ่ม "เพิ่มพนักงาน" ด้านบน</div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="14"><div class="empty-state"><b>ยังไม่มีข้อมูล</b>เพิ่มพนักงานคนแรกด้วยปุ่ม "เพิ่มพนักงาน" ด้านบน</div></td></tr>`;
     return;
   }
   tbody.innerHTML = rows.map(r => `
@@ -415,6 +427,8 @@ function renderTable() {
         <span class="bar-wrap"><span class="bar" style="width:${Math.min(r.pct,100)}%"></span></span>${fmt(r.pct,2)}%
       </td>
       <td class="num">${fmt(r.salesScore,2)}</td>
+      <td class="num">${r.ssiCount ? fmt(r.ssiScore,2) : '<span class="muted">-</span>'}</td>
+      <td class="num muted">${r.ssiCount} ครั้ง</td>
       <td class="num">${r.examCount ? fmt(r.examAvg,2)+'%' : '<span class="muted">-</span>'}</td>
       <td class="num muted">${r.examCount} ครั้ง</td>
       <td class="num">${r.behaviorCount ? fmt(r.behaviorScore,2) : '<span class="muted">-</span>'}</td>
@@ -448,13 +462,13 @@ document.querySelectorAll('#mainTable thead th').forEach(th => {
 async function loadData() {
   if (!CONFIG.url) { renderAll(); return; }
   try {
-    document.getElementById('tbody').innerHTML = `<tr><td colspan="12"><div class="loading"><div class="spin"></div>กำลังโหลดข้อมูล...</div></td></tr>`;
+    document.getElementById('tbody').innerHTML = `<tr><td colspan="14"><div class="loading"><div class="spin"></div>กำลังโหลดข้อมูล...</div></td></tr>`;
     const data = await api('getAll');
     DATA = data;
     renderAll();
   } catch (err) {
     toast('โหลดข้อมูลไม่สำเร็จ: ' + err.message, true);
-    document.getElementById('tbody').innerHTML = `<tr><td colspan="12"><div class="empty-state"><b>โหลดข้อมูลไม่สำเร็จ</b>${escapeHtml(err.message)}</div></td></tr>`;
+    document.getElementById('tbody').innerHTML = `<tr><td colspan="14"><div class="empty-state"><b>โหลดข้อมูลไม่สำเร็จ</b>${escapeHtml(err.message)}</div></td></tr>`;
   }
 }
 
@@ -564,8 +578,9 @@ function renderEmployeeModal() {
         <div class="summary-grid">
           <div class="box"><b>${fmt(r.pct,2)}%</b><span>%ยอดขาย</span></div>
           <div class="box"><b>${fmt(r.salesScore,2)}/50</b><span>คะแนนขาย</span></div>
-          <div class="box"><b>${fmt(r.knowledgeScore,2)}/30</b><span>คะแนนความรู้</span></div>
-          <div class="box"><b>${fmt(r.behaviorScore,2)}/20</b><span>คะแนนพฤติกรรม</span></div>
+          <div class="box"><b>${fmt(r.ssiScore,2)}/20</b><span>คะแนน SSI</span></div>
+          <div class="box"><b>${fmt(r.knowledgeScore,2)}/20</b><span>คะแนนความรู้</span></div>
+          <div class="box"><b>${fmt(r.behaviorScore,2)}/10</b><span>คะแนนพฤติกรรม</span></div>
         </div>
         <div style="text-align:center;margin:-8px 0 16px;">
           <span class="badge ${badgeClass(r.group)}" style="font-size:14px;padding:6px 16px;">${r.group} · รวม ${fmt(r.total,2)}/100</span>
@@ -574,6 +589,7 @@ function renderEmployeeModal() {
         <div class="tabs">
           <button class="tab ${currentTab==='sales'?'active':''}" onclick="switchTab('sales')">🚗 ยอดขาย</button>
           <button class="tab ${currentTab==='exam'?'active':''}" onclick="switchTab('exam')">📝 ผลสอบ</button>
+          <button class="tab ${currentTab==='ssi'?'active':''}" onclick="switchTab('ssi')">😊 SSI</button>
           <button class="tab ${currentTab==='behavior'?'active':''}" onclick="switchTab('behavior')">🤝 พฤติกรรม</button>
         </div>
 
@@ -612,6 +628,16 @@ function renderTabContent(r) {
       </div>
       ${entryListHtml(r.examEntries, 'คะแนน', '%', 'exam')}
     `;
+  } else if (currentTab === 'ssi') {
+    el.innerHTML = `
+      <div class="entry-form">
+        <div class="field"><label>เดือน/วันที่ประเมิน</label><input type="date" id="fSSIDate" value="${todayStr()}"></div>
+        <div class="field"><label>คะแนนดิบ (เต็ม ${SSI_MAX.toFixed(2)})</label><input type="text" inputmode="decimal" id="fSSIScore" placeholder="0-${SSI_MAX}"></div>
+        <div class="field" style="flex:2;"><label>หมายเหตุ</label><input type="text" id="fSSINote" placeholder="เช่น รอบเดือนสิงหาคม"></div>
+        <button class="btn-primary btn-sm" onclick="addSSIEntry()">＋ บันทึก</button>
+      </div>
+      ${rawScoreEntryListHtml(r.ssiEntries, SSI_MAX, 'ssi')}
+    `;
   } else {
     el.innerHTML = `
       <div class="entry-form">
@@ -620,26 +646,26 @@ function renderTabContent(r) {
         <div class="field" style="flex:2;"><label>หมายเหตุ</label><input type="text" id="fBehNote" placeholder="เช่น ประเมินโดยหัวหน้าสาขา"></div>
         <button class="btn-primary btn-sm" onclick="addBehaviorEntry()">＋ บันทึก</button>
       </div>
-      ${behaviorEntryListHtml(r.behaviorEntries)}
+      ${rawScoreEntryListHtml(r.behaviorEntries, BEHAVIOR_MAX, 'behavior')}
     `;
   }
 }
 
-function behaviorEntryListHtml(entries) {
-  if (!entries.length) return `<div class="entry-list"><div class="entry-empty">ยังไม่มีรายการ — เพิ่มรายการแรกด้านบน (กรอกคะแนนดิบเต็ม ${BEHAVIOR_MAX})</div></div>`;
+function rawScoreEntryListHtml(entries, max, type) {
+  if (!entries.length) return `<div class="entry-list"><div class="entry-empty">ยังไม่มีรายการ — เพิ่มรายการแรกด้านบน (กรอกคะแนนดิบเต็ม ${max})</div></div>`;
   const sorted = [...entries].sort((a,b) => new Date(b['วันที่']) - new Date(a['วันที่']));
   return `<div class="entry-list">${sorted.map(en => {
     const raw = Number(en['คะแนน']) || 0;
-    const pct = raw / BEHAVIOR_MAX * 100;
+    const pct = raw / max * 100;
     return `
     <div class="entry-row">
       <div>
-        <span class="val">${fmt(raw)}/${BEHAVIOR_MAX}</span>
+        <span class="val">${fmt(raw,2)}/${max}</span>
         <span class="muted"> · ${fmt(pct,2)}%</span>
         ${en['หมายเหตุ'] ? `<span class="muted"> · ${escapeHtml(en['หมายเหตุ'])}</span>` : ''}
         <div class="date">${fmtDate(en['วันที่'])}</div>
       </div>
-      <button class="btn-danger btn-sm" onclick="removeEntry('behavior','${en.ID}')">ลบ</button>
+      <button class="btn-danger btn-sm" onclick="removeEntry('${type}','${en.ID}')">ลบ</button>
     </div>`;
   }).join('')}</div>`;
 }
@@ -718,6 +744,20 @@ async function addBehaviorEntry() {
   try {
     await api('addBehavior', { empId: currentEmpId, date, score, note });
     toast('บันทึกคะแนนพฤติกรรมแล้ว (' + score + '/' + BEHAVIOR_MAX + ') — อัปเดตค่าเฉลี่ยอัตโนมัติ');
+    await loadData();
+    renderEmployeeModal();
+  } catch (err) { toast(err.message, true); }
+}
+
+async function addSSIEntry() {
+  const date = document.getElementById('fSSIDate').value;
+  const score = document.getElementById('fSSIScore').value.trim();
+  const note = document.getElementById('fSSINote').value.trim();
+  if (!score || isNaN(Number(score))) { toast('กรุณากรอกคะแนน SSI (คะแนนดิบ เต็ม ' + SSI_MAX + ')', true); return; }
+  if (Number(score) > SSI_MAX) { toast('คะแนนดิบต้องไม่เกิน ' + SSI_MAX, true); return; }
+  try {
+    await api('addSSI', { empId: currentEmpId, date, score, note });
+    toast('บันทึกคะแนน SSI แล้ว (' + score + '/' + SSI_MAX + ') — อัปเดตค่าเฉลี่ยอัตโนมัติ');
     await loadData();
     renderEmployeeModal();
   } catch (err) { toast(err.message, true); }
