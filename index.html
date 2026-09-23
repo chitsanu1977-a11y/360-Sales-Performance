@@ -538,10 +538,11 @@ async function submitAddEmployee() {
   const target = document.getElementById('newTarget').value.trim();
   if (!name) { toast('กรุณากรอกชื่อพนักงาน', true); return; }
   try {
-    await api('addEmployee', { name, branch, target: target || 0 });
+    const res = await api('addEmployee', { name, branch, target: target || 0 });
+    DATA.employees.push({ ID: res.id, 'ชื่อ-นามสกุล': name, 'สาขา': branch, 'เป้าขาย': Number(target) || 0, 'สร้างเมื่อ': new Date().toISOString() });
     closeModal();
     toast('เพิ่มพนักงานเรียบร้อย');
-    await loadData();
+    renderAll();
   } catch (err) { toast(err.message, true); }
 }
 document.getElementById('btnAddEmp').addEventListener('click', openAddEmployee);
@@ -696,8 +697,14 @@ async function saveEmployeeEdit() {
   if (!name) { toast('กรุณากรอกชื่อพนักงาน', true); return; }
   try {
     await api('updateEmployee', { id: currentEmpId, name, branch, target: target || 0 });
+    const emp = DATA.employees.find(e => e.ID === currentEmpId);
+    if (emp) {
+      emp['ชื่อ-นามสกุล'] = name;
+      emp['สาขา'] = branch;
+      emp['เป้าขาย'] = Number(target) || 0;
+    }
     toast('บันทึกข้อมูลแล้ว');
-    await loadData();
+    renderAll();
     renderEmployeeModal();
   } catch (err) { toast(err.message, true); }
 }
@@ -706,63 +713,72 @@ function removeEmployee(id) {
   askPin(async () => {
     try {
       await api('deleteEmployee', { id });
+      DATA.employees = DATA.employees.filter(e => e.ID !== id);
+      DATA.sales = DATA.sales.filter(e => e.EmployeeID !== id);
+      DATA.exams = DATA.exams.filter(e => e.EmployeeID !== id);
+      DATA.behaviors = DATA.behaviors.filter(e => e.EmployeeID !== id);
+      DATA.ssi = DATA.ssi.filter(e => e.EmployeeID !== id);
       closeModal();
       toast('ลบพนักงานแล้ว');
-      await loadData();
+      renderAll();
     } catch (err) { toast(err.message, true); }
   });
 }
 
 async function addSalesEntry() {
-  const date = document.getElementById('fSalesDate').value;
+  const date = document.getElementById('fSalesDate').value || todayStr();
   const qty = document.getElementById('fSalesQty').value.trim();
   const note = document.getElementById('fSalesNote').value.trim();
   if (!qty || isNaN(Number(qty))) { toast('กรุณากรอกจำนวนคัน', true); return; }
   try {
-    await api('addSales', { empId: currentEmpId, date, qty, note });
+    const res = await api('addSales', { empId: currentEmpId, date, qty, note });
+    DATA.sales.push({ ID: res.id, EmployeeID: currentEmpId, 'วันที่': date, 'จำนวน': Number(qty), 'หมายเหตุ': note });
     toast('บันทึกยอดขายแล้ว');
-    await loadData();
+    renderAll();
     renderEmployeeModal();
   } catch (err) { toast(err.message, true); }
 }
 
 async function addExamEntry() {
-  const date = document.getElementById('fExamDate').value;
+  const date = document.getElementById('fExamDate').value || todayStr();
   const score = document.getElementById('fExamScore').value.trim();
   const note = document.getElementById('fExamNote').value.trim();
   if (!score || isNaN(Number(score))) { toast('กรุณากรอกคะแนนสอบ', true); return; }
   try {
-    await api('addExam', { empId: currentEmpId, date, score, note });
+    const res = await api('addExam', { empId: currentEmpId, date, score, note });
+    DATA.exams.push({ ID: res.id, EmployeeID: currentEmpId, 'วันที่': date, 'คะแนน': Number(score), 'หมายเหตุ': note });
     toast('บันทึกผลสอบแล้ว — อัปเดตค่าเฉลี่ยและจำนวนครั้งอัตโนมัติ');
-    await loadData();
+    renderAll();
     renderEmployeeModal();
   } catch (err) { toast(err.message, true); }
 }
 
 async function addBehaviorEntry() {
-  const date = document.getElementById('fBehDate').value;
+  const date = document.getElementById('fBehDate').value || todayStr();
   const score = document.getElementById('fBehScore').value.trim();
   const note = document.getElementById('fBehNote').value.trim();
   if (!score || isNaN(Number(score))) { toast('กรุณากรอกคะแนนพฤติกรรม (คะแนนดิบ เต็ม ' + BEHAVIOR_MAX + ')', true); return; }
   if (Number(score) > BEHAVIOR_MAX) { toast('คะแนนดิบต้องไม่เกิน ' + BEHAVIOR_MAX, true); return; }
   try {
-    await api('addBehavior', { empId: currentEmpId, date, score, note });
+    const res = await api('addBehavior', { empId: currentEmpId, date, score, note });
+    DATA.behaviors.push({ ID: res.id, EmployeeID: currentEmpId, 'วันที่': date, 'คะแนน': Number(score), 'หมายเหตุ': note });
     toast('บันทึกคะแนนพฤติกรรมแล้ว (' + score + '/' + BEHAVIOR_MAX + ') — อัปเดตค่าเฉลี่ยอัตโนมัติ');
-    await loadData();
+    renderAll();
     renderEmployeeModal();
   } catch (err) { toast(err.message, true); }
 }
 
 async function addSSIEntry() {
-  const date = document.getElementById('fSSIDate').value;
+  const date = document.getElementById('fSSIDate').value || todayStr();
   const score = document.getElementById('fSSIScore').value.trim();
   const note = document.getElementById('fSSINote').value.trim();
   if (!score || isNaN(Number(score))) { toast('กรุณากรอกคะแนน SSI (คะแนนดิบ เต็ม ' + SSI_MAX + ')', true); return; }
   if (Number(score) > SSI_MAX) { toast('คะแนนดิบต้องไม่เกิน ' + SSI_MAX, true); return; }
   try {
-    await api('addSSI', { empId: currentEmpId, date, score, note });
+    const res = await api('addSSI', { empId: currentEmpId, date, score, note });
+    DATA.ssi.push({ ID: res.id, EmployeeID: currentEmpId, 'วันที่': date, 'คะแนน': Number(score), 'หมายเหตุ': note });
     toast('บันทึกคะแนน SSI แล้ว (' + score + '/' + SSI_MAX + ') — อัปเดตค่าเฉลี่ยอัตโนมัติ');
-    await loadData();
+    renderAll();
     renderEmployeeModal();
   } catch (err) { toast(err.message, true); }
 }
@@ -771,8 +787,11 @@ function removeEntry(type, id) {
   askPin(async () => {
     try {
       await api('deleteEntry', { type, id });
+      const map = { sales: 'sales', exam: 'exams', behavior: 'behaviors', ssi: 'ssi' };
+      const key = map[type];
+      if (key) DATA[key] = DATA[key].filter(e => e.ID !== id);
       toast('ลบรายการแล้ว');
-      await loadData();
+      renderAll();
       renderEmployeeModal();
     } catch (err) { toast(err.message, true); }
   });
